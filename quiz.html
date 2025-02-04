@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jap Ji Sahib Word Meaning Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .quiz-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .question {
+            margin: 20px 0;
+        }
+        .options label {
+            display: block;
+            margin: 5px 0;
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background: #218838;
+        }
+        .result {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Jap Ji Sahib Word Meaning Quiz</h1>
+
+    <form id="quizForm">
+
+        <div class="question">
+            <h2>1. What is the meaning of 'Ik Onkar' in Jap Ji Sahib?</h2>
+            <div class="options">
+                <label><input type="radio" name="q1" value="correct"> One Supreme Reality</label>
+                <label><input type="radio" name="q1" value="wrong"> Eternal Guru</label>
+                <label><input type="radio" name="q1" value="wrong"> Divine Light</label>
+                <label><input type="radio" name="q1" value="wrong"> True Name</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <h2>2. What does ‘Satnaam’ signify in Jap Ji Sahib?</h2>
+            <div class="options">
+                <label><input type="radio" name="q2" value="correct"> True Name</label>
+                <label><input type="radio" name="q2" value="wrong"> Ultimate Reality</label>
+                <label><input type="radio" name="q2" value="wrong"> Divine Grace</label>
+                <label><input type="radio" name="q2" value="wrong"> Immortal Being</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <h2>3. What is the meaning of ‘Karta Purakh’?</h2>
+            <div class="options">
+                <label><input type="radio" name="q3" value="correct"> Creator Being</label>
+                <label><input type="radio" name="q3" value="wrong"> Self-Illuminated</label>
+                <label><input type="radio" name="q3" value="wrong"> Divine Will</label>
+                <label><input type="radio" name="q3" value="wrong"> Fearless One</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <h2>4. ‘Nirbhau’ and ‘Nirvair’ mean what in Jap Ji Sahib?</h2>
+            <div class="options">
+                <label><input type="checkbox" name="q4" value="correct"> Without Fear</label>
+                <label><input type="checkbox" name="q4" value="correct"> Without Enmity</label>
+                <label><input type="checkbox" name="q4" value="wrong"> Merciful Lord</label>
+                <label><input type="checkbox" name="q4" value="wrong"> Eternal Truth</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <h2>5. What is the significance of ‘Hukam’ in Jap Ji Sahib?</h2>
+            <textarea id="q5" rows="3" cols="50" placeholder="Type your answer here..."></textarea>
+        </div>
+
+        <button type="button" class="submit-btn" onclick="calculateScore()">Submit</button>
+
+        <div class="result" id="resultMessage"></div>
+
+    </form>
+</div>
+
+<script>
+    function calculateScore() {
+        let score = 0;
+        let totalQuestions = 4; // Only radio and checkbox questions are scored
+
+        // Check radio button answers
+        let q1 = document.querySelector('input[name="q1"]:checked');
+        let q2 = document.querySelector('input[name="q2"]:checked');
+        let q3 = document.querySelector('input[name="q3"]:checked');
+
+        if (q1 && q1.value === "correct") score++;
+        if (q2 && q2.value === "correct") score++;
+        if (q3 && q3.value === "correct") score++;
+
+        // Check checkbox question
+        let checkboxes = document.querySelectorAll('input[name="q4"]:checked');
+        let correctAnswers = ["Without Fear", "Without Enmity"];
+        let userAnswers = Array.from(checkboxes).map(cb => cb.parentElement.innerText.trim());
+
+        if (userAnswers.length === 2 && correctAnswers.every(ans => userAnswers.includes(ans))) {
+            score++;
+        }
+
+        // Display result
+        document.getElementById("resultMessage").style.display = "block";
+        document.getElementById("resultMessage").innerHTML = `Your score is <strong>${score}/${totalQuestions}</strong>. Keep learning and deepening your understanding of Jap Ji Sahib!`;
+    }
+</script>
+
+</body>
+</html>
