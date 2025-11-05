@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Religion Olympiad</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+        }
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #f0f0f0;
+            color: var(--primary-color);
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 8px;
+        }
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        .group-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .badge-zero { background: #e3f2fd; color: #1976d2; }
+        .badge-first { background: #f3e5f5; color: #7b1fa2; }
+        .badge-second { background: #e8f5e9; color: #388e3c; }
+        .badge-third { background: #fff3e0; color: #f57c00; }
+        .badge-open { background: #fce4ec; color: #c2185b; }
+        .audit-log-entry {
+            padding: 10px;
+            border-left: 3px solid var(--primary-color);
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-lock-fill"></i> Religion Olympiad - Admin
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3">
+                    <i class="bi bi-person-circle"></i> <span id="adminName">Admin</span>
+                </span>
+                <button class="btn btn-outline-light" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('registrations')">
+                        <i class="bi bi-list-ul"></i> All Registrations
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('schools')">
+                        <i class="bi bi-building"></i> Schools Management
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('fees')">
+                        <i class="bi bi-currency-rupee"></i> Fee Structure
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('reports')">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Reports
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('audit')">
+                        <i class="bi bi-clock-history"></i> Audit Logs
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="container-fluid py-4">
+                    <!-- Dashboard Section -->
+                    <div id="dashboardSection" class="content-section">
+                        <h2 class="mb-4"><i class="bi bi-speedometer2"></i> System Overview</h2>
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+                                    <h2 id="totalStudentsStat">0</h2>
+                                    <p>Total Registrations</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <i class="bi bi-building" style="font-size: 2rem;"></i>
+                                    <h2 id="totalSchoolsStat">0</h2>
+                                    <p>Registered Schools</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <i class="bi bi-currency-rupee" style="font-size: 2rem;"></i>
+                                    <h2 id="totalRevenueStat">0</h2>
+                                    <p>Total Revenue</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                    <i class="bi bi-graph-up" style="font-size: 2rem;"></i>
+                                    <h2 id="avgFeeStat">0</h2>
+                                    <p>Avg Fee/Student</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="bi bi-bar-chart-fill"></i> Registrations by Group
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="groupStatsContainer"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <i class="bi bi-activity"></i> Recent Activity
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="recentActivityContainer">
+                                            <p class="text-muted">No recent activity</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- All Registrations Section -->
+                    <div id="registrationsSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-list-ul"></i> All Student Registrations
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" id="searchInput" placeholder="Search by name or ID...">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="groupFilter">
+                                            <option value="">All Groups</option>
+                                            <option value="Zero Group">Zero Group</option>
+                                            <option value="First Group">First Group</option>
+                                            <option value="Second Group">Second Group</option>
+                                            <option value="Third Group">Third Group</option>
+                                            <option value="Open Group">Open Group</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-primary" onclick="exportToCSV()">
+                                            <i class="bi bi-download"></i> Export CSV
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="allRegistrationsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Student ID</th>
+                                                <th>Name</th>
+                                                <th>Class</th>
+                                                <th>Group</th>
+                                                <th>School</th>
+                                                <th>Book</th>
+                                                <th>Fee</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="8" class="text-center">Loading...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schools Management Section -->
+                    <div id="schoolsSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-building"></i> Schools Management
+                            </div>
+                            <div class="card-body">
+                                <div id="schoolAlertContainer"></div>
+                                
+                                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addSchoolModal">
+                                    <i class="bi bi-plus-circle"></i> Add New School
+                                </button>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="schoolsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>School ID</th>
+                                                <th>School Name</th>
+                                                <th>Username</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>Registrations</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="8" class="text-center">Loading...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fee Structure Section -->
+                    <div id="feesSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-currency-rupee"></i> Fee Structure Management
+                            </div>
+                            <div class="card-body">
+                                <div id="feeAlertContainer"></div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Group</th>
+                                                <th>Classes</th>
+                                                <th>Base Fee (₹)</th>
+                                                <th>Book Physical (₹)</th>
+                                                <th>Book Digital (₹)</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="feeTableBody">
+                                            <tr>
+                                                <td>Zero Group</td>
+                                                <td>1-3</td>
+                                                <td><input type="number" class="form-control" value="30" data-group="Zero Group" data-field="base"></td>
+                                                <td><input type="number" class="form-control" value="50" data-group="Zero Group" data-field="physical"></td>
+                                                <td><input type="number" class="form-control" value="45" data-group="Zero Group" data-field="digital"></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary" onclick="updateFee('Zero Group')">
+                                                        <i class="bi bi-check"></i> Update
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>First Group</td>
+                                                <td>4-5</td>
+                                                <td><input type="number" class="form-control" value="40" data-group="First Group" data-field="base"></td>
+                                                <td><input type="number" class="form-control" value="40" data-group="First Group" data-field="physical"></td>
+                                                <td><input type="number" class="form-control" value="36" data-group="First Group" data-field="digital"></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary" onclick="updateFee('First Group')">
+                                                        <i class="bi bi-check"></i> Update
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Second Group</td>
+                                                <td>6-8</td>
+                                                <td><input type="number" class="form-control" value="40" data-group="Second Group" data-field="base"></td>
+                                                <td><input type="number" class="form-control" value="40" data-group="Second Group" data-field="physical"></td>
+                                                <td><input type="number" class="form-control" value="36" data-group="Second Group" data-field="digital"></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary" onclick="updateFee('Second Group')">
+                                                        <i class="bi bi-check"></i> Update
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Third Group</td>
+                                                <td>9-12</td>
+                                                <td><input type="number" class="form-control" value="50" data-group="Third Group" data-field="base"></td>
+                                                <td><input type="number" class="form-control" value="70" data-group="Third Group" data-field="physical"></td>
+                                                <td><input type="number" class="form-control" value="63" data-group="Third Group" data-field="digital"></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary" onclick="updateFee('Third Group')">
+                                                        <i class="bi bi-check"></i> Update
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Open Group</td>
+                                                <td>Others</td>
+                                                <td><input type="number" class="form-control" value="70" data-group="Open Group" data-field="base"></td>
+                                                <td><input type="number" class="form-control" value="100" data-group="Open Group" data-field="physical"></td>
+                                                <td><input type="number" class="form-control" value="90" data-group="Open Group" data-field="digital"></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary" onclick="updateFee('Open Group')">
+                                                        <i class="bi bi-check"></i> Update
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Section -->
+                    <div id="reportsSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-file-earmark-bar-graph"></i> Reports & Analytics
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <h5>Generate Reports</h5>
+                                        <div class="btn-group-vertical w-100" role="group">
+                                            <button class="btn btn-outline-primary mb-2" onclick="generateReport('all')">
+                                                <i class="bi bi-file-text"></i> All Registrations Report
+                                            </button>
+                                            <button class="btn btn-outline-primary mb-2" onclick="generateReport('group')">
+                                                <i class="bi bi-pie-chart"></i> Group-wise Report
+                                            </button>
+                                            <button class="btn btn-outline-primary mb-2" onclick="generateReport('school')">
+                                                <i class="bi bi-building"></i> School-wise Report
+                                            </button>
+                                            <button class="btn btn-outline-primary mb-2" onclick="generateReport('revenue')">
+                                                <i class="bi bi-currency-rupee"></i> Revenue Report
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Quick Stats</h5>
+                                        <div id="quickStatsContainer">
+                                            <div class="p-3 bg-light rounded mb-2">
+                                                <strong>Total Students:</strong> <span id="reportTotalStudents">0</span>
+                                            </div>
+                                            <div class="p-3 bg-light rounded mb-2">
+                                                <strong>Total Revenue:</strong> <span id="reportTotalRevenue">₹0</span>
+                                            </div>
+                                            <div class="p-3 bg-light rounded mb-2">
+                                                <strong>With Books:</strong> <span id="reportWithBooks">0</span>
+                                            </div>
+                                            <div class="p-3 bg-light rounded mb-2">
+                                                <strong>Digital Books:</strong> <span id="reportDigitalBooks">0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audit Logs Section -->
+                    <div id="auditSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-clock-history"></i> Audit Logs
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="auditSearch" placeholder="Search logs...">
+                                </div>
+                                
+                                <div id="auditLogsContainer" style="max-height: 600px; overflow-y: auto;">
+                                    <div class="audit-log-entry">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>admin</strong>
+                                            <small class="text-muted">2024-01-15 10:30:45</small>
+                                        </div>
+                                        <div><span class="badge bg-info">LOGIN</span> User logged in successfully</div>
+                                    </div>
+                                    <div class="audit-log-entry">
+                                        <div class="d-flex justify-content-between">
+                                            <strong>school001</strong>
+                                            <small class="text-muted">2024-01-15 11:20:15</small>
+                                        </div>
+                                        <div><span class="badge bg-success">REGISTER_STUDENT</span> Student STU1705315215000 registered</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add School Modal -->
+    <div class="modal fade" id="addSchoolModal" tabindex="-1" aria-labelledby="addSchoolModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSchoolModalLabel">
+                        <i class="bi bi-plus-circle"></i> Add New School
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalAlertContainer"></div>
+                    <form id="addSchoolForm">
+                        <div class="mb-3">
+                            <label for="schoolName" class="form-label">School Name *</label>
+                            <input type="text" class="form-control" id="schoolName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="schoolUsername" class="form-label">Username *</label>
+                            <input type="text" class="form-control" id="schoolUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="schoolPassword" class="form-label">Password *</label>
+                            <input type="password" class="form-control" id="schoolPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="schoolEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="schoolEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label for="schoolPhone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="schoolPhone">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check-circle"></i> Create School Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mock data
+        let allRegistrations = [];
+        let schools = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            const role = sessionStorage.getItem('role');
+            const username = sessionStorage.getItem('username');
+            
+            if (!username || role !== 'Admin') {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('adminName').textContent = username;
+            
+            loadMockData();
+            updateDashboard();
+            
+            // Event listeners
+            document.getElementById('searchInput')?.addEventListener('input', filterRegistrations);
+            document.getElementById('groupFilter')?.addEventListener('change', filterRegistrations);
+            document.getElementById('addSchoolForm').addEventListener('submit', handleAddSchool);
+        });
+
+        function loadMockData() {
+            // Load registrations from localStorage (from dashboard)
+            const stored = localStorage.getItem('registrations');
+            if (stored) {
+                allRegistrations = JSON.parse(stored);
+            } else {
+                // Add some mock data
+                allRegistrations = [
+                    {
+                        studentId: 'STU1705315215001',
+                        studentName: 'John Doe',
+                        class: '5',
+                        group: 'First Group',
+                        schoolId: 'school001',
+                        schoolName: 'Test School',
+                        includeBook: true,
+                        bookType: 'Physical',
+                        totalFee: 80,
+                        date: '2024-01-15 10:30:00'
+                    }
+                ];
+            }
+            
+            // Mock schools
+            schools = [
+                {
+                    schoolId: 'school001',
+                    schoolName: 'Test School',
+                    username: 'school',
+                    email: 'school@example.com',
+                    phone: '1234567890',
+                    registrations: 5,
+                    active: true
+                }
+            ];
+        }
+
+        function showAlert(message, type = 'success', containerId = 'schoolAlertContainer') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 150);
+            }, 5000);
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            switch(section) {
+                case 'dashboard':
+                    document.getElementById('dashboardSection').style.display = 'block';
+                    updateDashboard();
+                    break;
+                case 'registrations':
+                    document.getElementById('registrationsSection').style.display = 'block';
+                    loadAllRegistrations();
+                    break;
+                case 'schools':
+                    document.getElementById('schoolsSection').style.display = 'block';
+                    loadSchools();
+                    break;
+                case 'fees':
+                    document.getElementById('feesSection').style.display = 'block';
+                    break;
+                case 'reports':
+                    document.getElementById('reportsSection').style.display = 'block';
+                    updateReportStats();
+                    break;
+                case 'audit':
+                    document.getElementById('auditSection').style.display = 'block';
+                    break;
+            }
+            
+            event.target.classList.add('active');
+        }
+
+        function updateDashboard() {
+            const totalStudents = allRegistrations.length;
+            const totalRevenue = allRegistrations.reduce((sum, reg) => sum + reg.totalFee, 0);
+            const avgFee = totalStudents > 0 ? Math.round(totalRevenue / totalStudents) : 0;
+            
+            document.getElementById('totalStudentsStat').textContent = totalStudents;
+            document.getElementById('totalSchoolsStat').textContent = schools.length;
+            document.getElementById('totalRevenueStat').textContent = '₹' + totalRevenue;
+            document.getElementById('avgFeeStat').textContent = '₹' + avgFee;
+            
+            // Group stats
+            const groupStats = {};
+            allRegistrations.forEach(reg => {
+                if (!groupStats[reg.group]) {
+                    groupStats[reg.group] = { count: 0, revenue: 0 };
+                }
+                groupStats[reg.group].count++;
+                groupStats[reg.group].revenue += reg.totalFee;
+            });
+            
+            const groupStatsHtml = Object.keys(groupStats).map(group => {
+                const badgeClass = group.replace(' Group', '').toLowerCase();
+                return `
+                    <div class="p-3 mb-2 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="group-badge badge-${badgeClass}">${group}</span>
+                            <div>
+                                <strong>${groupStats[group].count}</strong> students | 
+                                <strong>₹${groupStats[group].revenue}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('groupStatsContainer').innerHTML = groupStatsHtml || '<p class="text-muted">No data available</p>';
+        }
+
+        function loadAllRegistrations() {
+            const tbody = document.getElementById('allRegistrationsTable').querySelector('tbody');
+            
+            if (allRegistrations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No registrations found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = allRegistrations.map(reg => {
+                const badgeClass = reg.group.replace(' Group', '').toLowerCase();
+                return `
+                    <tr>
+                        <td>${reg.studentId}</td>
+                        <td>${reg.studentName}</td>
+                        <td>${reg.class}</td>
+                        <td><span class="group-badge badge-${badgeClass}">${reg.group}</span></td>
+                        <td>${reg.schoolName || 'N/A'}</td>
+                        <td>${reg.includeBook ? reg.bookType : 'No'}</td>
+                        <td>₹${reg.totalFee}</td>
+                        <td>${reg.date}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterRegistrations() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const groupFilter = document.getElementById('groupFilter').value;
+            
+            const filtered = allRegistrations.filter(reg => {
+                const matchesSearch = reg.studentName.toLowerCase().includes(searchTerm) || 
+                                    reg.studentId.toLowerCase().includes(searchTerm);
+                const matchesGroup = !groupFilter || reg.group === groupFilter;
+                
+                return matchesSearch && matchesGroup;
+            });
+            
+            const tbody = document.getElementById('allRegistrationsTable').querySelector('tbody');
+            tbody.innerHTML = filtered.map(reg => {
+                const badgeClass = reg.group.replace(' Group', '').toLowerCase();
+                return `
+                    <tr>
+                        <td>${reg.studentId}</td>
+                        <td>${reg.studentName}</td>
+                        <td>${reg.class}</td>
+                        <td><span class="group-badge badge-${badgeClass}">${reg.group}</span></td>
+                        <td>${reg.schoolName || 'N/A'}</td>
+                        <td>${reg.includeBook ? reg.bookType : 'No'}</td>
+                        <td>₹${reg.totalFee}</td>
+                        <td>${reg.date}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function loadSchools() {
+            const tbody = document.getElementById('schoolsTable').querySelector('tbody');
+            
+            if (schools.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No schools registered</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = schools.map(school => `
+                <tr>
+                    <td>${school.schoolId}</td>
+                    <td>${school.schoolName}</td>
+                    <td>${school.username}</td>
+                    <td>${school.email}</td>
+                    <td>${school.phone}</td>
+                    <td>${school.registrations}</td>
+                    <td>
+                        <span class="badge ${school.active ? 'bg-success' : 'bg-danger'}">
+                            ${school.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editSchool('${school.schoolId}')">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function handleAddSchool(e) {
+            e.preventDefault();
+            
+            const schoolData = {
+                schoolId: 'SCH' + Date.now(),
+                schoolName: document.getElementById('schoolName').value,
+                username: document.getElementById('schoolUsername').value,
+                email: document.getElementById('schoolEmail').value,
+                phone: document.getElementById('schoolPhone').value,
+                registrations: 0,
+                active: true
+            };
+            
+            schools.push(schoolData);
+            
+            showAlert('School added successfully!', 'success', 'modalAlertContainer');
+            
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('addSchoolModal')).hide();
+                document.getElementById('addSchoolForm').reset();
+                loadSchools();
+            }, 1500);
+        }
+
+        function editSchool(schoolId) {
+            alert('Edit school: ' + schoolId);
+        }
+
+        function updateFee(group) {
+            const baseFee = document.querySelector(`input[data-group="${group}"][data-field="base"]`).value;
+            const physical = document.querySelector(`input[data-group="${group}"][data-field="physical"]`).value;
+            const digital = document.querySelector(`input[data-group="${group}"][data-field="digital"]`).value;
+            
+            showAlert(`Fee structure for ${group} updated successfully!`, 'success', 'feeAlertContainer');
+        }
+
+        function updateReportStats() {
+            const totalStudents = allRegistrations.length;
+            const totalRevenue = allRegistrations.reduce((sum, reg) => sum + reg.totalFee, 0);
+            const withBooks = allRegistrations.filter(reg => reg.includeBook).length;
+            const digitalBooks = allRegistrations.filter(reg => reg.includeBook && reg.bookType === 'Digital').length;
+            
+            document.getElementById('reportTotalStudents').textContent = totalStudents;
+            document.getElementById('reportTotalRevenue').textContent = '₹' + totalRevenue;
+            document.getElementById('reportWithBooks').textContent = withBooks;
+            document.getElementById('reportDigitalBooks').textContent = digitalBooks;
+        }
+
+        function generateReport(type) {
+            alert(`Generating ${type} report...`);
+        }
+
+        function exportToCSV() {
+            let csv = 'Student ID,Name,Class,Group,School,Book,Fee,Date\n';
+            
+            allRegistrations.forEach(reg => {
+                csv += `${reg.studentId},${reg.studentName},${reg.class},${reg.group},${reg.schoolName || 'N/A'},${reg.includeBook ? reg.bookType : 'No'},${reg.totalFee},${reg.date}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'registrations_' + new Date().getTime() + '.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

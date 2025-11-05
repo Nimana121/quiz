@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Dashboard - Religion Olympiad</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        .sidebar {
+            min-height: calc(100vh - 56px);
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+        }
+        .sidebar .nav-link {
+            color: #333;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #f0f0f0;
+            color: var(--primary-color);
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .fee-summary {
+            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .fee-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .fee-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        .group-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .badge-zero { background: #e3f2fd; color: #1976d2; }
+        .badge-first { background: #f3e5f5; color: #7b1fa2; }
+        .badge-second { background: #e8f5e9; color: #388e3c; }
+        .badge-third { background: #fff3e0; color: #f57c00; }
+        .badge-open { background: #fce4ec; color: #c2185b; }
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .csv-preview {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-trophy-fill"></i> Religion Olympiad
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3">
+                    <i class="bi bi-building"></i> <span id="schoolName">School Name</span>
+                </span>
+                <button class="btn btn-outline-light" onclick="logout()">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar no-print">
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="#" onclick="showSection('single')">
+                        <i class="bi bi-person-plus"></i> Single Registration
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('bulk')">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> Bulk Registration
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('registrations')">
+                        <i class="bi bi-list-ul"></i> My Registrations
+                    </a>
+                    <a class="nav-link" href="#" onclick="showSection('payment')">
+                        <i class="bi bi-credit-card"></i> Payment Summary
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="container-fluid py-4">
+                    <!-- Single Registration Section -->
+                    <div id="singleSection" class="content-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-person-plus"></i> Single Student Registration
+                            </div>
+                            <div class="card-body">
+                                <div id="alertContainer"></div>
+                                
+                                <form id="registrationForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="studentName" class="form-label">
+                                                <i class="bi bi-person"></i> Student Name *
+                                            </label>
+                                            <input type="text" class="form-control" id="studentName" required>
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-3">
+                                            <label for="studentClass" class="form-label">
+                                                <i class="bi bi-book"></i> Class *
+                                            </label>
+                                            <select class="form-select" id="studentClass" required>
+                                                <option value="">Select Class</option>
+                                                <option value="1">Class 1</option>
+                                                <option value="2">Class 2</option>
+                                                <option value="3">Class 3</option>
+                                                <option value="4">Class 4</option>
+                                                <option value="5">Class 5</option>
+                                                <option value="6">Class 6</option>
+                                                <option value="7">Class 7</option>
+                                                <option value="8">Class 8</option>
+                                                <option value="9">Class 9</option>
+                                                <option value="10">Class 10</option>
+                                                <option value="11">Class 11</option>
+                                                <option value="12">Class 12</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div id="groupDisplay" class="mt-2"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="includeBook">
+                                                <label class="form-check-label" for="includeBook">
+                                                    Include Book
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row" id="bookOptionsRow" style="display: none;">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Book Type *</label>
+                                            <div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="bookType" id="bookPhysical" value="Physical" checked>
+                                                    <label class="form-check-label" for="bookPhysical">
+                                                        Physical
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="bookType" id="bookDigital" value="Digital">
+                                                    <label class="form-check-label" for="bookDigital">
+                                                        Digital
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6 mb-3" id="emailRow" style="display: none;">
+                                            <label for="studentEmail" class="form-label">
+                                                <i class="bi bi-envelope"></i> Email Address *
+                                            </label>
+                                            <input type="email" class="form-control" id="studentEmail" placeholder="required for digital books">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="fee-summary" id="feeSummary" style="display: none;">
+                                        <h5><i class="bi bi-calculator"></i> Fee Calculation</h5>
+                                        <div class="fee-item">
+                                            <span>Base Fee:</span>
+                                            <span id="baseFee">₹0</span>
+                                        </div>
+                                        <div class="fee-item">
+                                            <span>Book Fee:</span>
+                                            <span id="bookFee">₹0</span>
+                                        </div>
+                                        <div class="fee-item">
+                                            <span>Total Fee:</span>
+                                            <span id="totalFee">₹0</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle"></i> Register Student
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                                            <i class="bi bi-x-circle"></i> Reset
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Registration Section -->
+                    <div id="bulkSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Bulk Student Registration
+                            </div>
+                            <div class="card-body">
+                                <div id="bulkAlertContainer"></div>
+                                
+                                <div class="alert alert-info">
+                                    <h6><i class="bi bi-info-circle"></i> CSV Format Instructions:</h6>
+                                    <p class="mb-2">Upload a CSV file with the following columns:</p>
+                                    <code>Student Name, Class, Include Book (Yes/No), Book Type (Physical/Digital), Email</code>
+                                    <p class="mt-2 mb-0">
+                                        <a href="#" onclick="downloadSampleCSV()" class="text-decoration-none">
+                                            <i class="bi bi-download"></i> Download Sample CSV
+                                        </a>
+                                    </p>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="csvFile" class="form-label">
+                                        <i class="bi bi-upload"></i> Upload CSV File
+                                    </label>
+                                    <input type="file" class="form-control" id="csvFile" accept=".csv">
+                                </div>
+                                
+                                <div id="csvPreviewContainer" style="display: none;">
+                                    <h5 class="mt-4">Preview</h5>
+                                    <div class="csv-preview table-responsive">
+                                        <table class="table table-striped" id="csvPreviewTable">
+                                            <thead></thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <button class="btn btn-primary" onclick="processBulkRegistration()">
+                                            <i class="bi bi-check-circle"></i> Process Bulk Registration
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Registrations Section -->
+                    <div id="registrationsSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-list-ul"></i> My Registrations
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="registrationsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Student ID</th>
+                                                <th>Student Name</th>
+                                                <th>Class</th>
+                                                <th>Group</th>
+                                                <th>Book</th>
+                                                <th>Total Fee</th>
+                                                <th>Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="7" class="text-center">Loading...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Summary Section -->
+                    <div id="paymentSection" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="bi bi-credit-card"></i> Payment Summary
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Payment Details</h5>
+                                        <div class="fee-summary">
+                                            <div class="fee-item">
+                                                <span>Total Students:</span>
+                                                <span id="totalStudents">0</span>
+                                            </div>
+                                            <div class="fee-item">
+                                                <span>Total Amount:</span>
+                                                <span id="totalAmount">₹0</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <h6>Payment Instructions:</h6>
+                                            <ol>
+                                                <li>Scan the QR code or use the payment details below</li>
+                                                <li>Make the payment of the total amount</li>
+                                                <li>Keep the transaction ID for reference</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 text-center">
+                                        <h5>Payment QR Code</h5>
+                                        <div id="qrCodeContainer" class="mt-3">
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=olympiad@upi&pn=ReligionOlympiad&cu=INR" 
+                                                 alt="Payment QR Code" 
+                                                 class="img-fluid"
+                                                 style="max-width: 300px;">
+                                        </div>
+                                        <p class="mt-3">
+                                            <strong>UPI ID:</strong> olympiad@upi<br>
+                                            <strong>Name:</strong> Religion Olympiad
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 no-print">
+                                    <button class="btn btn-primary" onclick="window.print()">
+                                        <i class="bi bi-printer"></i> Print Summary
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fee structure
+        const FEE_STRUCTURE = {
+            'Zero Group': { base: 30, bookPhysical: 50, bookDigital: 45, classes: ['1', '2', '3'] },
+            'First Group': { base: 40, bookPhysical: 40, bookDigital: 36, classes: ['4', '5'] },
+            'Second Group': { base: 40, bookPhysical: 40, bookDigital: 36, classes: ['6', '7', '8'] },
+            'Third Group': { base: 50, bookPhysical: 70, bookDigital: 63, classes: ['9', '10', '11', '12'] },
+            'Open Group': { base: 70, bookPhysical: 100, bookDigital: 90, classes: ['Others'] }
+        };
+
+        // Mock registrations storage
+        let registrations = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            const username = sessionStorage.getItem('username');
+            const schoolName = sessionStorage.getItem('schoolName');
+            
+            if (!username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('schoolName').textContent = schoolName || 'School';
+            
+            // Event listeners
+            document.getElementById('studentClass').addEventListener('change', calculateFees);
+            document.getElementById('includeBook').addEventListener('change', handleBookCheckbox);
+            document.querySelectorAll('input[name="bookType"]').forEach(radio => {
+                radio.addEventListener('change', handleBookTypeChange);
+            });
+            
+            document.getElementById('registrationForm').addEventListener('submit', handleSingleRegistration);
+            document.getElementById('csvFile').addEventListener('change', handleCSVUpload);
+            
+            loadRegistrations();
+        });
+
+        function showAlert(message, type = 'success', containerId = 'alertContainer') {
+            const container = document.getElementById(containerId);
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 150);
+            }, 5000);
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            switch(section) {
+                case 'single':
+                    document.getElementById('singleSection').style.display = 'block';
+                    break;
+                case 'bulk':
+                    document.getElementById('bulkSection').style.display = 'block';
+                    break;
+                case 'registrations':
+                    document.getElementById('registrationsSection').style.display = 'block';
+                    loadRegistrations();
+                    break;
+                case 'payment':
+                    document.getElementById('paymentSection').style.display = 'block';
+                    updatePaymentSummary();
+                    break;
+            }
+            
+            event.target.classList.add('active');
+        }
+
+        function getGroupForClass(classValue) {
+            for (const [group, config] of Object.entries(FEE_STRUCTURE)) {
+                if (config.classes.includes(classValue)) {
+                    return group;
+                }
+            }
+            return 'Open Group';
+        }
+
+        function calculateFees() {
+            const classValue = document.getElementById('studentClass').value;
+            const includeBook = document.getElementById('includeBook').checked;
+            const bookType = document.querySelector('input[name="bookType"]:checked')?.value || 'Physical';
+            
+            if (!classValue) {
+                document.getElementById('feeSummary').style.display = 'none';
+                document.getElementById('groupDisplay').innerHTML = '';
+                return;
+            }
+            
+            const group = getGroupForClass(classValue);
+            const config = FEE_STRUCTURE[group];
+            
+            let baseFee = config.base;
+            let bookFee = 0;
+            
+            if (includeBook) {
+                bookFee = bookType === 'Digital' ? config.bookDigital : config.bookPhysical;
+            }
+            
+            const totalFee = baseFee + bookFee;
+            
+            // Display group
+            const badgeClass = group.replace(' Group', '').toLowerCase();
+            document.getElementById('groupDisplay').innerHTML = `
+                <label class="form-label">Group:</label>
+                <div><span class="group-badge badge-${badgeClass}">${group}</span></div>
+            `;
+            
+            // Display fees
+            document.getElementById('baseFee').textContent = '₹' + baseFee;
+            document.getElementById('bookFee').textContent = '₹' + bookFee;
+            document.getElementById('totalFee').textContent = '₹' + totalFee;
+            document.getElementById('feeSummary').style.display = 'block';
+        }
+
+        function handleBookCheckbox() {
+            const includeBook = document.getElementById('includeBook').checked;
+            document.getElementById('bookOptionsRow').style.display = includeBook ? 'flex' : 'none';
+            
+            if (includeBook) {
+                handleBookTypeChange();
+            }
+            
+            calculateFees();
+        }
+
+        function handleBookTypeChange() {
+            const bookType = document.querySelector('input[name="bookType"]:checked')?.value;
+            const emailRow = document.getElementById('emailRow');
+            const emailInput = document.getElementById('studentEmail');
+            
+            if (bookType === 'Digital') {
+                emailRow.style.display = 'block';
+                emailInput.required = true;
+            } else {
+                emailRow.style.display = 'none';
+                emailInput.required = false;
+            }
+            
+            calculateFees();
+        }
+
+        function handleSingleRegistration(e) {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('studentName').value.trim();
+            const classValue = document.getElementById('studentClass').value;
+            const includeBook = document.getElementById('includeBook').checked;
+            const bookType = includeBook ? document.querySelector('input[name="bookType"]:checked')?.value : '';
+            const email = document.getElementById('studentEmail').value.trim();
+            
+            // Validate
+            if (!studentName || !classValue) {
+                showAlert('Please fill all required fields.', 'danger');
+                return;
+            }
+            
+            if (includeBook && bookType === 'Digital' && !email) {
+                showAlert('Email is required for digital books.', 'danger');
+                return;
+            }
+            
+            // Calculate fees
+            const group = getGroupForClass(classValue);
+            const config = FEE_STRUCTURE[group];
+            const baseFee = config.base;
+            const bookFee = includeBook ? (bookType === 'Digital' ? config.bookDigital : config.bookPhysical) : 0;
+            const totalFee = baseFee + bookFee;
+            
+            // Create registration
+            const registration = {
+                studentId: 'STU' + Date.now(),
+                studentName,
+                class: classValue,
+                group,
+                includeBook,
+                bookType,
+                email,
+                baseFee,
+                bookFee,
+                totalFee,
+                date: new Date().toLocaleString()
+            };
+            
+            registrations.push(registration);
+            localStorage.setItem('registrations', JSON.stringify(registrations));
+            
+            showAlert(`Student "${studentName}" registered successfully! Total Fee: ₹${totalFee}`, 'success');
+            
+            resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById('registrationForm').reset();
+            document.getElementById('feeSummary').style.display = 'none';
+            document.getElementById('groupDisplay').innerHTML = '';
+            document.getElementById('bookOptionsRow').style.display = 'none';
+            document.getElementById('emailRow').style.display = 'none';
+        }
+
+        function loadRegistrations() {
+            const stored = localStorage.getItem('registrations');
+            if (stored) {
+                registrations = JSON.parse(stored);
+            }
+            
+            const tbody = document.getElementById('registrationsTable').querySelector('tbody');
+            
+            if (registrations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No registrations found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = registrations.map(reg => `
+                <tr>
+                    <td>${reg.studentId}</td>
+                    <td>${reg.studentName}</td>
+                    <td>${reg.class}</td>
+                    <td><span class="group-badge badge-${reg.group.replace(' Group', '').toLowerCase()}">${reg.group}</span></td>
+                    <td>${reg.includeBook ? reg.bookType : 'No'}</td>
+                    <td>₹${reg.totalFee}</td>
+                    <td>${reg.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePaymentSummary() {
+            const totalStudents = registrations.length;
+            const totalAmount = registrations.reduce((sum, reg) => sum + reg.totalFee, 0);
+            
+            document.getElementById('totalStudents').textContent = totalStudents;
+            document.getElementById('totalAmount').textContent = '₹' + totalAmount;
+        }
+
+        function handleCSVUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const csv = event.target.result;
+                displayCSVPreview(csv);
+            };
+            reader.readAsText(file);
+        }
+
+        function displayCSVPreview(csv) {
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length < 2) {
+                showAlert('CSV file is empty or invalid.', 'danger', 'bulkAlertContainer');
+                return;
+            }
+            
+            const headers = lines[0].split(',').map(h => h.trim());
+            const table = document.getElementById('csvPreviewTable');
+            
+            // Create header
+            table.querySelector('thead').innerHTML = `
+                <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+            `;
+            
+            // Create body
+            const rows = lines.slice(1).map(line => {
+                const cols = line.split(',').map(c => c.trim());
+                return `<tr>${cols.map(c => `<td>${c}</td>`).join('')}</tr>`;
+            }).join('');
+            
+            table.querySelector('tbody').innerHTML = rows;
+            document.getElementById('csvPreviewContainer').style.display = 'block';
+            
+            // Store CSV for processing
+            window.currentCSV = csv;
+        }
+
+        function processBulkRegistration() {
+            if (!window.currentCSV) return;
+            
+            const lines = window.currentCSV.split('\n').filter(line => line.trim()).slice(1);
+            let successCount = 0;
+            let failCount = 0;
+            
+            lines.forEach(line => {
+                const cols = line.split(',').map(c => c.trim());
+                if (cols.length < 3) {
+                    failCount++;
+                    return;
+                }
+                
+                const studentName = cols[0];
+                const classValue = cols[1];
+                const includeBook = cols[2]?.toLowerCase() === 'yes';
+                const bookType = cols[3] || 'Physical';
+                const email = cols[4] || '';
+                
+                // Calculate fees
+                const group = getGroupForClass(classValue);
+                const config = FEE_STRUCTURE[group];
+                const baseFee = config.base;
+                const bookFee = includeBook ? (bookType === 'Digital' ? config.bookDigital : config.bookPhysical) : 0;
+                const totalFee = baseFee + bookFee;
+                
+                // Validate
+                if (includeBook && bookType === 'Digital' && !email) {
+                    failCount++;
+                    return;
+                }
+                
+                // Create registration
+                const registration = {
+                    studentId: 'STU' + Date.now() + successCount,
+                    studentName,
+                    class: classValue,
+                    group,
+                    includeBook,
+                    bookType,
+                    email,
+                    baseFee,
+                    bookFee,
+                    totalFee,
+                    date: new Date().toLocaleString()
+                };
+                
+                registrations.push(registration);
+                successCount++;
+            });
+            
+            localStorage.setItem('registrations', JSON.stringify(registrations));
+            
+            showAlert(
+                `Bulk registration completed! Success: ${successCount}, Failed: ${failCount}`,
+                failCount > 0 ? 'warning' : 'success',
+                'bulkAlertContainer'
+            );
+            
+            // Reset
+            document.getElementById('csvFile').value = '';
+            document.getElementById('csvPreviewContainer').style.display = 'none';
+            window.currentCSV = null;
+        }
+
+        function downloadSampleCSV() {
+            const csv = `Student Name,Class,Include Book,Book Type,Email
+John Doe,5,Yes,Physical,
+Jane Smith,10,Yes,Digital,jane@example.com
+Mike Johnson,Others,No,,`;
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'sample_registration.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>
