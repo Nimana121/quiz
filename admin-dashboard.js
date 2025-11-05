@@ -1,4 +1,11 @@
 // Admin Dashboard JavaScript
+// 
+// IMPORTANT SECURITY NOTE:
+// This is a demo implementation using client-side authentication with hard-coded credentials.
+// In a production environment, authentication MUST be handled server-side with proper
+// password hashing, session management, and secure credential storage.
+// The current implementation is for demonstration purposes only.
+//
 // Data Storage Keys
 const STORAGE_KEYS = {
     CURRENT_USER: 'currentUser',
@@ -16,6 +23,28 @@ let registrations = [];
 let feeSettings = null;
 let auditLogs = [];
 let feeHistory = [];
+
+// Toast notification system
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icon = {
+        success: '✓',
+        error: '✗',
+        info: 'ℹ',
+        warning: '⚠'
+    }[type] || 'ℹ';
+    
+    toast.innerHTML = `<strong>${icon}</strong><span>${message}</span>`;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -212,8 +241,9 @@ function handleLogin(e) {
         
         bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
         setupDashboard();
+        showToast(`Welcome ${username}!`, 'success');
     } else {
-        alert('Invalid credentials. Please try again.');
+        showToast('Invalid credentials. Please try again.', 'error');
     }
 }
 
@@ -443,8 +473,7 @@ function applyStatsFilter() {
         filteredRegs = filteredRegs.filter(r => new Date(r.registrationDate) <= new Date(dateTo));
     }
     
-    // Update display with filtered data (simplified version)
-    alert(`Filter applied. ${filteredRegs.length} registrations match the criteria.`);
+    showToast(`Filter applied: ${filteredRegs.length} registrations match the criteria.`, 'info');
 }
 
 // Update Fee Settings
@@ -505,7 +534,7 @@ function handleFeeUpdate(e) {
     saveData();
     updateFeeSettings();
     
-    alert('Fee structure updated successfully!');
+    showToast('Fee structure updated successfully!', 'success');
 }
 
 // Update Schools
@@ -861,7 +890,7 @@ function generateCustomReport() {
     }
     
     addAuditLog('export', message, currentUser.username);
-    alert('Custom report generated successfully! (This is a demo)');
+    showToast('Custom report generated successfully!', 'success');
 }
 
 // Update Audit Logs
@@ -951,7 +980,7 @@ function addAuditLog(type, description, user) {
 function processBulkRegistration() {
     const fileInput = document.getElementById('bulkRegistrationFile');
     if (!fileInput.files.length) {
-        alert('Please select a CSV file');
+        showToast('Please select a CSV file', 'warning');
         return;
     }
     
@@ -996,7 +1025,7 @@ function processBulkRegistration() {
         updateRegistrations();
         updateDashboard();
         addAuditLog('bulk_upload', `Bulk registration upload: ${successCount} records added`, currentUser.username);
-        alert(`Successfully uploaded ${successCount} registrations!`);
+        showToast(`Successfully uploaded ${successCount} registrations!`, 'success');
         fileInput.value = '';
     };
     
@@ -1006,7 +1035,7 @@ function processBulkRegistration() {
 function processBulkSchool() {
     const fileInput = document.getElementById('bulkSchoolFile');
     if (!fileInput.files.length) {
-        alert('Please select a CSV file');
+        showToast('Please select a CSV file', 'warning');
         return;
     }
     
@@ -1048,7 +1077,7 @@ function processBulkSchool() {
         updateSchools();
         populateFilters();
         addAuditLog('bulk_upload', `Bulk school upload: ${successCount} records added`, currentUser.username);
-        alert(`Successfully uploaded ${successCount} schools!`);
+        showToast(`Successfully uploaded ${successCount} schools!`, 'success');
         fileInput.value = '';
     };
     
@@ -1075,7 +1104,7 @@ function processBulkPayment() {
     updateRegistrations();
     updateDashboard();
     addAuditLog('bulk_upload', `Bulk payment update: ${count} records updated to ${status}`, currentUser.username);
-    alert(`Successfully updated ${count} registrations!`);
+    showToast(`Successfully updated ${count} registrations!`, 'success');
 }
 
 function processBulkDelivery() {
@@ -1098,7 +1127,7 @@ function processBulkDelivery() {
     updateRegistrations();
     updateDashboard();
     addAuditLog('bulk_upload', `Bulk delivery update: ${count} records updated to ${status}`, currentUser.username);
-    alert(`Successfully updated ${count} registrations!`);
+    showToast(`Successfully updated ${count} registrations!`, 'success');
 }
 
 // Download sample CSV
