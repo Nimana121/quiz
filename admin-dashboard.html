@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Quiz Registration System</title>
+    <style>
+        /* Reset and base styles */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* Bootstrap-like utility classes */
+        .container-fluid { width: 100%; padding: 0; }
+        .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
+        .col-md-2 { flex: 0 0 16.666667%; max-width: 16.666667%; padding: 0 15px; }
+        .col-md-3 { flex: 0 0 25%; max-width: 25%; padding: 0 15px; }
+        .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; padding: 0 15px; }
+        .col-md-6 { flex: 0 0 50%; max-width: 50%; padding: 0 15px; }
+        .col-md-10 { flex: 0 0 83.333333%; max-width: 83.333333%; padding: 0 15px; }
+        .col-md-12 { flex: 0 0 100%; max-width: 100%; padding: 0 15px; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1050; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal.show { display: block; }
+        .modal-dialog { position: relative; width: auto; max-width: 500px; margin: 1.75rem auto; }
+        .modal-dialog-centered { display: flex; align-items: center; min-height: calc(100% - 3.5rem); }
+        .modal-content { position: relative; display: flex; flex-direction: column; width: 100%; background-color: #fff; border-radius: 0.3rem; outline: 0; }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #dee2e6; border-radius: 0.3rem 0.3rem 0 0; }
+        .modal-title { margin-bottom: 0; line-height: 1.5; }
+        .modal-body { position: relative; flex: 1 1 auto; padding: 1rem; }
+        .modal-footer { display: flex; align-items: center; justify-content: flex-end; padding: 0.75rem; border-top: 1px solid #dee2e6; }
+        .btn-close { background: transparent; border: 0; font-size: 1.5rem; cursor: pointer; }
+        
+        /* Forms */
+        .form-label { display: inline-block; margin-bottom: 0.5rem; }
+        .form-control, .form-select { display: block; width: 100%; padding: 0.375rem 0.75rem; font-size: 1rem; line-height: 1.5; color: #212529; background-color: #fff; border: 1px solid #ced4da; border-radius: 0.25rem; }
+        .form-control:focus, .form-select:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25); }
+        .input-group { position: relative; display: flex; flex-wrap: wrap; align-items: stretch; width: 100%; }
+        .input-group-text { display: flex; align-items: center; padding: 0.375rem 0.75rem; font-size: 1rem; background-color: #e9ecef; border: 1px solid #ced4da; }
+        
+        /* Buttons */
+        .btn { display: inline-block; padding: 0.375rem 0.75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; border: 1px solid transparent; border-radius: 0.25rem; transition: all 0.15s ease-in-out; }
+        .btn-primary { color: #fff; background-color: #0d6efd; border-color: #0d6efd; }
+        .btn-primary:hover { background-color: #0b5ed7; border-color: #0a58ca; }
+        .btn-secondary { color: #fff; background-color: #6c757d; border-color: #6c757d; }
+        .btn-success { color: #fff; background-color: #198754; border-color: #198754; }
+        .btn-warning { color: #000; background-color: #ffc107; border-color: #ffc107; }
+        .btn-info { color: #000; background-color: #0dcaf0; border-color: #0dcaf0; }
+        .btn-danger { color: #fff; background-color: #dc3545; border-color: #dc3545; }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
+        .w-100 { width: 100% !important; }
+        
+        /* Card */
+        .card { position: relative; display: flex; flex-direction: column; min-width: 0; background-color: #fff; border: 1px solid rgba(0,0,0,.125); border-radius: 0.25rem; margin-bottom: 1rem; }
+        .card-header { padding: 0.5rem 1rem; margin-bottom: 0; background-color: rgba(0,0,0,.03); border-bottom: 1px solid rgba(0,0,0,.125); }
+        .card-body { flex: 1 1 auto; padding: 1rem; }
+        
+        /* Table */
+        .table { width: 100%; margin-bottom: 1rem; color: #212529; border-collapse: collapse; }
+        .table th, .table td { padding: 0.5rem; border-top: 1px solid #dee2e6; }
+        .table thead th { vertical-align: bottom; border-bottom: 2px solid #dee2e6; }
+        .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(0,0,0,.05); }
+        .table-hover tbody tr:hover { background-color: rgba(0,0,0,.075); }
+        
+        /* Badge */
+        .badge { display: inline-block; padding: 0.35em 0.65em; font-size: 0.75em; font-weight: 700; line-height: 1; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 0.25rem; }
+        .bg-primary { background-color: #0d6efd !important; }
+        .bg-success { background-color: #198754 !important; }
+        .bg-warning { background-color: #ffc107 !important; color: #000 !important; }
+        .bg-danger { background-color: #dc3545 !important; }
+        .bg-info { background-color: #0dcaf0 !important; color: #000 !important; }
+        .bg-secondary { background-color: #6c757d !important; }
+        .bg-dark { background-color: #212529 !important; }
+        
+        /* Progress bar */
+        .progress { display: flex; height: 1rem; overflow: hidden; font-size: 0.75rem; background-color: #e9ecef; border-radius: 0.25rem; margin-bottom: 0.5rem; }
+        .progress-bar { display: flex; flex-direction: column; justify-content: center; overflow: hidden; color: #fff; text-align: center; white-space: nowrap; background-color: #0d6efd; transition: width 0.6s ease; }
+        
+        /* Text utilities */
+        .text-center { text-align: center !important; }
+        .text-white { color: #fff !important; }
+        .text-muted { color: #6c757d !important; }
+        .text-success { color: #198754 !important; }
+        .text-warning { color: #ffc107 !important; }
+        
+        /* Spacing utilities */
+        .mb-2 { margin-bottom: 0.5rem !important; }
+        .mb-3 { margin-bottom: 1rem !important; }
+        .mb-4 { margin-bottom: 1.5rem !important; }
+        .mt-3 { margin-top: 1rem !important; }
+        .mt-4 { margin-top: 1.5rem !important; }
+        .ms-2 { margin-left: 0.5rem !important; }
+        .pt-3 { padding-top: 1rem !important; }
+        .small { font-size: 0.875em; }
+        
+        /* Display utilities */
+        .d-flex { display: flex !important; }
+        .d-block { display: block !important; }
+        .d-md-block { display: block !important; }
+        .justify-content-between { justify-content: space-between !important; }
+        .align-items-center { align-items: center !important; }
+        
+        /* Icons (basic replacement) */
+        .bi::before { display: inline-block; font-style: normal; font-variant: normal; text-rendering: auto; -webkit-font-smoothing: antialiased; }
+        .bi-speedometer2::before { content: "📊"; }
+        .bi-graph-up::before { content: "📈"; }
+        .bi-currency-dollar::before { content: "💰"; }
+        .bi-building::before { content: "🏢"; }
+        .bi-people::before { content: "👥"; }
+        .bi-file-earmark-text::before { content: "📄"; }
+        .bi-clock-history::before { content: "🕐"; }
+        .bi-arrow-repeat::before { content: "🔄"; }
+        .bi-box-arrow-right::before { content: "🚪"; }
+        .bi-plus-circle::before { content: "➕"; }
+        .bi-pencil::before { content: "✏️"; }
+        .bi-trash::before { content: "🗑️"; }
+        .bi-download::before { content: "⬇️"; }
+        .bi-upload::before { content: "⬆️"; }
+        .bi-check-circle::before { content: "✓"; }
+        .bi-truck::before { content: "🚚"; }
+        .bi-file-earmark-spreadsheet::before { content: "📊"; }
+        .bi-cash-stack::before { content: "💵"; }
+        
+        /* Navigation */
+        .nav { display: flex; flex-wrap: wrap; padding-left: 0; margin-bottom: 0; list-style: none; }
+        .nav-link { display: block; padding: 0.5rem 1rem; text-decoration: none; transition: color 0.15s ease-in-out; }
+        .nav.flex-column { flex-direction: column; }
+        .nav-item { margin: 0; }
+        
+        /* List */
+        .list { list-style: none; }
+        
+        /* Position */
+        .position-sticky { position: sticky; top: 0; }
+        
+        /* Custom styles remain */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            padding: 12px 20px;
+            margin: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(52, 152, 219, 0.3);
+            color: #fff;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+        .main-content {
+            padding: 30px;
+        }
+        .stat-card {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            color: #6c757d;
+            margin: 0;
+        }
+        .bg-primary-custom { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .bg-success-custom { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .bg-info-custom { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .bg-warning-custom { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .page-section {
+            display: none;
+        }
+        .page-section.active {
+            display: block;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #fff !important;
+        }
+        .user-badge {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        .audit-log-entry {
+            border-left: 3px solid #3498db;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast.success { border-left: 4px solid #198754; }
+        .toast.error { border-left: 4px solid #dc3545; }
+        .toast.info { border-left: 4px solid #0dcaf0; }
+        .toast.warning { border-left: 4px solid #ffc107; }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+        .toast.hiding {
+            animation: slideOut 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Admin Login</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select class="form-select" id="role" required>
+                                <option value="admin">Admin</option>
+                                <option value="coordinator">Coordinator</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                    </form>
+                    <div class="mt-3 text-muted small">
+                        <strong>Demo Credentials:</strong><br>
+                        Admin: admin / admin123<br>
+                        Coordinator: coordinator / coord123
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-2 d-md-block sidebar collapse" id="sidebarMenu">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Quiz Admin</h4>
+                        <span class="user-badge" id="userInfo"></span>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-section="dashboard">
+                                <i class="bi bi-speedometer2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="statistics">
+                                <i class="bi bi-graph-up"></i>Statistics
+                            </a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="#" data-section="fees">
+                                <i class="bi bi-currency-dollar"></i>Fee Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="schools">
+                                <i class="bi bi-building"></i>Schools
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="registrations">
+                                <i class="bi bi-people"></i>Registrations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="reports">
+                                <i class="bi bi-file-earmark-text"></i>Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="audit">
+                                <i class="bi bi-clock-history"></i>Audit Logs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-section="bulk">
+                                <i class="bi bi-arrow-repeat"></i>Bulk Operations
+                            </a>
+                        </li>
+                        <li class="nav-item mt-4">
+                            <a class="nav-link" href="#" id="logoutBtn">
+                                <i class="bi bi-box-arrow-right"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-10 ms-sm-auto main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="page-section active">
+                    <h2 class="mb-4">Dashboard Overview</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-card bg-primary-custom text-white">
+                                <h3 id="totalRegistrations">0</h3>
+                                <p>Total Registrations</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card bg-success-custom text-white">
+                                <h3 id="totalSchools">0</h3>
+                                <p>Active Schools</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card bg-info-custom text-white">
+                                <h3 id="totalRevenue">$0</h3>
+                                <p>Total Revenue</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card bg-warning-custom text-white">
+                                <h3 id="pendingPayments">0</h3>
+                                <p>Pending Payments</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5>Recent Registrations</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Student</th>
+                                                    <th>School</th>
+                                                    <th>Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recentRegistrations">
+                                                <tr><td colspan="3" class="text-center">No registrations yet</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5>Payment Status Overview</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="paymentStatusChart" class="chart-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Section -->
+                <div id="statistics" class="page-section">
+                    <h2 class="mb-4">Statistics</h2>
+                    
+                    <div class="filter-section">
+                        <h5>Filters</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">School</label>
+                                <select class="form-select" id="statsSchoolFilter">
+                                    <option value="">All Schools</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date From</label>
+                                <input type="date" class="form-control" id="statsDateFrom">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Date To</label>
+                                <input type="date" class="form-control" id="statsDateTo">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary mt-3" onclick="applyStatsFilter()">Apply Filters</button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5>Per-School Statistics</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>School Name</th>
+                                                    <th>Registrations</th>
+                                                    <th>Revenue</th>
+                                                    <th>Paid</th>
+                                                    <th>Pending</th>
+                                                    <th>Books Delivered</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="schoolStatsTable">
+                                                <tr><td colspan="6" class="text-center">No data available</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-warning">
+                                    <h5>Participation Analytics</h5>
+                                </div>
+                                <div class="card-body" id="participationAnalytics">
+                                    <!-- Analytics content -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h5>Book Delivery Status</h5>
+                                </div>
+                                <div class="card-body" id="bookDeliveryStatus">
+                                    <!-- Delivery status content -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fee Settings Section -->
+                <div id="fees" class="page-section admin-only">
+                    <h2 class="mb-4">Fee Structure Settings</h2>
+                    
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5>Current Fee Structure</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="feeSettingsForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Registration Fee</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="registrationFee" step="0.01" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Book Fee</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="bookFee" step="0.01" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Late Registration Fee</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" id="lateFee" step="0.01" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Bulk Discount (%)</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="bulkDiscount" step="1" min="0" max="100" required>
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Fee Structure</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-info text-white">
+                            <h5>Fee Change History</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Changed By</th>
+                                            <th>Field</th>
+                                            <th>Old Value</th>
+                                            <th>New Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="feeHistoryTable">
+                                        <tr><td colspan="5" class="text-center">No changes recorded</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schools Section -->
+                <div id="schools" class="page-section">
+                    <h2 class="mb-4">School Management</h2>
+                    
+                    <div class="mb-3">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#schoolModal" onclick="openSchoolModal()">
+                            <i class="bi bi-plus-circle"></i> Add New School
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5>Schools List</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>School Name</th>
+                                            <th>Location</th>
+                                            <th>Coordinator</th>
+                                            <th>Contact</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="schoolsTable">
+                                        <tr><td colspan="6" class="text-center">No schools registered</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registrations Section -->
+                <div id="registrations" class="page-section">
+                    <h2 class="mb-4">Student Registrations</h2>
+                    
+                    <div class="filter-section">
+                        <h5>Search & Filter</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="searchStudent" placeholder="Search student...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterSchool">
+                                    <option value="">All Schools</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filterPaymentStatus">
+                                    <option value="">All Payment Status</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="overdue">Overdue</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100" onclick="applyRegistrationFilter()">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registrationModal" onclick="openRegistrationModal()">
+                            <i class="bi bi-plus-circle"></i> Add Registration
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5>Registrations List</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>School</th>
+                                            <th>Grade</th>
+                                            <th>Payment Status</th>
+                                            <th>Book Delivery</th>
+                                            <th>Registration Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="registrationsTable">
+                                        <tr><td colspan="7" class="text-center">No registrations found</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div id="reports" class="page-section">
+                    <h2 class="mb-4">Reports & Export</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-file-earmark-spreadsheet" style="font-size: 3rem; color: #28a745;"></i>
+                                    <h5 class="mt-3">Registration Report</h5>
+                                    <p class="text-muted">Export all registrations</p>
+                                    <button class="btn btn-success" onclick="exportReport('registrations')">
+                                        <i class="bi bi-download"></i> Export CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-cash-stack" style="font-size: 3rem; color: #ffc107;"></i>
+                                    <h5 class="mt-3">Payment Report</h5>
+                                    <p class="text-muted">Export payment details</p>
+                                    <button class="btn btn-warning" onclick="exportReport('payments')">
+                                        <i class="bi bi-download"></i> Export CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-building" style="font-size: 3rem; color: #17a2b8;"></i>
+                                    <h5 class="mt-3">School Report</h5>
+                                    <p class="text-muted">Export school statistics</p>
+                                    <button class="btn btn-info" onclick="exportReport('schools')">
+                                        <i class="bi bi-download"></i> Export CSV
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h5>Custom Report Generator</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="customReportForm">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Report Type</label>
+                                        <select class="form-select" id="reportType">
+                                            <option value="summary">Summary Report</option>
+                                            <option value="detailed">Detailed Report</option>
+                                            <option value="financial">Financial Report</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Start Date</label>
+                                        <input type="date" class="form-control" id="reportStartDate">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">End Date</label>
+                                        <input type="date" class="form-control" id="reportEndDate">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary mt-3" onclick="generateCustomReport()">
+                                    Generate Report
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Logs Section -->
+                <div id="audit" class="page-section">
+                    <h2 class="mb-4">Audit Logs</h2>
+                    
+                    <div class="filter-section">
+                        <h5>Filter Logs</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Activity Type</label>
+                                <select class="form-select" id="auditTypeFilter">
+                                    <option value="">All Activities</option>
+                                    <option value="login">Login</option>
+                                    <option value="fee_change">Fee Change</option>
+                                    <option value="school">School Management</option>
+                                    <option value="registration">Registration</option>
+                                    <option value="bulk_upload">Bulk Upload</option>
+                                    <option value="export">Export</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">User</label>
+                                <input type="text" class="form-control" id="auditUserFilter" placeholder="Username...">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Date From</label>
+                                <input type="date" class="form-control" id="auditDateFrom">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Date To</label>
+                                <input type="date" class="form-control" id="auditDateTo">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary mt-3" onclick="applyAuditFilter()">Apply Filters</button>
+                        <button class="btn btn-secondary mt-3" onclick="clearAuditFilter()">Clear</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-dark text-white">
+                            <h5>Activity Log</h5>
+                        </div>
+                        <div class="card-body" id="auditLogsContainer">
+                            <div class="text-center">No audit logs available</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Operations Section -->
+                <div id="bulk" class="page-section">
+                    <h2 class="mb-4">Bulk Operations</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5>Bulk Registration Upload</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Upload a CSV file with student registrations</p>
+                                    <div class="mb-3">
+                                        <label class="form-label">CSV File</label>
+                                        <input type="file" class="form-control" id="bulkRegistrationFile" accept=".csv">
+                                    </div>
+                                    <button class="btn btn-primary" onclick="processBulkRegistration()">
+                                        <i class="bi bi-upload"></i> Upload Registrations
+                                    </button>
+                                    <button class="btn btn-secondary ms-2" onclick="downloadSampleCSV('registrations')">
+                                        <i class="bi bi-download"></i> Download Sample
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5>Bulk School Upload</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Upload a CSV file with school information</p>
+                                    <div class="mb-3">
+                                        <label class="form-label">CSV File</label>
+                                        <input type="file" class="form-control" id="bulkSchoolFile" accept=".csv">
+                                    </div>
+                                    <button class="btn btn-success" onclick="processBulkSchool()">
+                                        <i class="bi bi-upload"></i> Upload Schools
+                                    </button>
+                                    <button class="btn btn-secondary ms-2" onclick="downloadSampleCSV('schools')">
+                                        <i class="bi bi-download"></i> Download Sample
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-warning">
+                                    <h5>Bulk Payment Update</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Update payment status for multiple registrations</p>
+                                    <div class="mb-3">
+                                        <label class="form-label">Select School</label>
+                                        <select class="form-select" id="bulkPaymentSchool">
+                                            <option value="">All Schools</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Payment Status</label>
+                                        <select class="form-select" id="bulkPaymentStatus">
+                                            <option value="paid">Paid</option>
+                                            <option value="pending">Pending</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-warning" onclick="processBulkPayment()">
+                                        <i class="bi bi-check-circle"></i> Update Payment Status
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-info text-white">
+                                    <h5>Bulk Book Delivery Update</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>Mark books as delivered for multiple registrations</p>
+                                    <div class="mb-3">
+                                        <label class="form-label">Select School</label>
+                                        <select class="form-select" id="bulkDeliverySchool">
+                                            <option value="">All Schools</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Delivery Status</label>
+                                        <select class="form-select" id="bulkDeliveryStatus">
+                                            <option value="delivered">Delivered</option>
+                                            <option value="pending">Pending</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-info" onclick="processBulkDelivery()">
+                                        <i class="bi bi-truck"></i> Update Delivery Status
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- School Modal -->
+    <div class="modal fade" id="schoolModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="schoolModalTitle">Add School</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="schoolForm">
+                        <input type="hidden" id="schoolId">
+                        <div class="mb-3">
+                            <label class="form-label">School Name</label>
+                            <input type="text" class="form-control" id="schoolName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Location</label>
+                            <input type="text" class="form-control" id="schoolLocation" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Coordinator Name</label>
+                            <input type="text" class="form-control" id="schoolCoordinator" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contact Email</label>
+                            <input type="email" class="form-control" id="schoolEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" id="schoolPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="schoolStatus">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSchool()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration Modal -->
+    <div class="modal fade" id="registrationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registrationModalTitle">Add Registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registrationForm">
+                        <input type="hidden" id="registrationId">
+                        <div class="mb-3">
+                            <label class="form-label">Student Name</label>
+                            <input type="text" class="form-control" id="studentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">School</label>
+                            <select class="form-select" id="studentSchool" required>
+                                <option value="">Select School</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Grade</label>
+                            <input type="text" class="form-control" id="studentGrade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Payment Status</label>
+                            <select class="form-select" id="paymentStatus">
+                                <option value="pending">Pending</option>
+                                <option value="paid">Paid</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Book Delivery</label>
+                            <select class="form-select" id="bookDelivery">
+                                <option value="pending">Pending</option>
+                                <option value="delivered">Delivered</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="registrationAmount" step="0.01" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRegistration()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Minimal Bootstrap modal replacement
+        window.bootstrap = {
+            Modal: function(element, options) {
+                this.element = element;
+                this.show = function() {
+                    this.element.classList.add('show');
+                    this.element.style.display = 'block';
+                };
+                this.hide = function() {
+                    this.element.classList.remove('show');
+                    this.element.style.display = 'none';
+                };
+                return this;
+            }
+        };
+        bootstrap.Modal.getInstance = function(element) {
+            return new bootstrap.Modal(element);
+        };
+    </script>
+    <script src="admin-dashboard.js"></script>
+</body>
+</html>
